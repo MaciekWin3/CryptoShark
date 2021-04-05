@@ -1,0 +1,87 @@
+﻿@page "/test"
+
+@inject IHttpClientFactory _clientFactory
+@inject ICryptocurrenciesData _db;
+@inject IJSRuntime jsRuntime
+@using CryptoShark.DataAccessLibrary.Models;
+
+<ChildComponent AlertText=@xd></ChildComponent>
+@if (string.IsNullOrWhiteSpace(errorString) == false)
+{
+    <div class="h2">@errorString</div>
+}
+else if (crypto is null)
+{
+    <div class="h4">Loading...</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Wolumen</th>
+                <th>Change</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@crypto.Ticker.Base</td>
+                <td>@crypto.Ticker.Price</td>
+                <td>@crypto.Ticker.Volume</td>
+                <td>@crypto.Ticker.Change</td>
+                <td>@crypto.Timestamp</td>
+            </tr>
+        </tbody>
+    </table>
+}
+<br />
+<h4>Dane</h4>
+@if (cryptocurrencies is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>@cryptocurrencies[0].Volume</p>
+}
+
+@code {
+
+    string xd = "haha";
+    CryptocurrencyModel crypto;
+    string errorString;
+    DateTimeOffset date = DateTime.Now;
+
+    private List<CryptocurrencySqlModel> cryptocurrencies;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //Api call
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            "btc-usd");
+
+        var client = _clientFactory.CreateClient("cryptonator");
+
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            crypto = await response.Content.ReadFromJsonAsync<CryptocurrencyModel>();
+            //date = DateTimeOffset.FromUnixTimeSeconds(crypto.Timestamp + 3600);
+            errorString = null;
+        }
+        else
+        {
+            errorString = $"There was an error : { response.ReasonPhrase }";
+        }
+
+        //Db call
+
+        cryptocurrencies = await _db.GetAllCryptoRecords();
+
+    }
+}

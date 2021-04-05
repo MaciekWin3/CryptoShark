@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoShark.BlazorServer", "CryptoShark.BlazorServer\CryptoShark.BlazorServer.csproj", "{0701ACA1-0834-41D5-A4FB-03BCFEAFC788}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoShark.DataAccessLibrary", "CryptoShark.DataAccessLibrary\CryptoShark.DataAccessLibrary.csproj", "{C573666F-FA22-4B36-80E2-05C3CF4C43BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoShark.Tests", "CryptoShark.Tests\CryptoShark.Tests.csproj", "{DC73F943-C6A8-4131-B884-5C05950D8B28}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0701ACA1-0834-41D5-A4FB-03BCFEAFC788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0701ACA1-0834-41D5-A4FB-03BCFEAFC788}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0701ACA1-0834-41D5-A4FB-03BCFEAFC788}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0701ACA1-0834-41D5-A4FB-03BCFEAFC788}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C573666F-FA22-4B36-80E2-05C3CF4C43BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C573666F-FA22-4B36-80E2-05C3CF4C43BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C573666F-FA22-4B36-80E2-05C3CF4C43BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C573666F-FA22-4B36-80E2-05C3CF4C43BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC73F943-C6A8-4131-B884-5C05950D8B28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC73F943-C6A8-4131-B884-5C05950D8B28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC73F943-C6A8-4131-B884-5C05950D8B28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC73F943-C6A8-4131-B884-5C05950D8B28}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0C1E58D3-65D1-4D9E-96A5-8FF2BBC1DBBD}
+	EndGlobalSection
+EndGlobal

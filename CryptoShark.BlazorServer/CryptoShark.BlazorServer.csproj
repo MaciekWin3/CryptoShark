@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <UserSecretsId>aspnet-CryptoShark.BlazorServer-152C99F8-575F-4BB8-AB1C-6015B3C6FFE8</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
+    <PackageReference Include="bunit" Version="1.0.0-preview-02" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.0-beta1" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.0-beta1" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+  </ItemGroup>
+    
+
+  <ItemGroup>
+    <ProjectReference Include="..\CryptoShark.DataAccessLibrary\CryptoShark.DataAccessLibrary.csproj" />
+  </ItemGroup>
+
+</Project>
