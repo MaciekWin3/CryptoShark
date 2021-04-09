@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Text;
 
 namespace CryptoShark.DataAccessLibrary.Models
@@ -12,10 +13,10 @@ namespace CryptoShark.DataAccessLibrary.Models
         public string Base { get; set; }
         //name of currency
         public string Target { get; set; }
-        public string Price { get; set; }
-        public string Volume { get; set; }
-        public string Change { get; set; }
-        public ulong Timestamp { get; set; }
-        public DateTime Date { get; set; }
+        public double Price { get; set; }
+        public double Volume { get; set; }
+        public double Change { get; set; }
+        public int Timestamp { get; set; }
+        public string Date { get; set; }
     }
 }

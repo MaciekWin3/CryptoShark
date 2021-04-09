@@ -7,6 +7,6 @@ namespace CryptoShark.DataAccessLibrary.Models
     public class CryptocurrencyModel
     {
         public CryptocurrencyTicker Ticker { get; set; }
-        public ulong Timestamp { get; set; }
+        public int Timestamp { get; set; }
     }
 }

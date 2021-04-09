@@ -139,11 +139,14 @@ namespace CryptoShark.BlazorServer
             });
 
             //Hangfire
+
+            
+
             app.UseHangfireDashboard();
 
-            HangfireJobs job = new HangfireJobs();
+            HangfireJobs Hangfire = new HangfireJobs();
 
-            backgroundJobs.Enqueue(() => job.CallApiAndSave());
+            RecurringJob.AddOrUpdate(() => HangfireJobs.CallApiAndSave(Configuration.GetConnectionString("Default")), Cron.Hourly);
 
 
             //Register syncfusion licence
