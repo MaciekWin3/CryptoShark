@@ -8,7 +8,7 @@ using Dapper;
 using System.Data;
 using System.Linq;
 
-namespace CryptoShark.CryptoDatabase.DataAccessLibrary
+namespace CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary
 {
     public class SqlDataAccess : ISqlDataAccess
     {

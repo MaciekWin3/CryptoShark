@@ -1,6 +1,5 @@
 using CryptoShark.BlazorServer.Areas.Identity;
 using CryptoShark.BlazorServer.Data;
-using CryptoShark.CryptoDatabase.DataAccessLibrary;
 using CryptoShark.DataAccessLibrary.CryptoDatabase;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
@@ -19,6 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Syncfusion.Blazor;
+using Hangfire.SqlServer;
+using CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary;
 
 namespace CryptoShark.BlazorServer
 {
@@ -36,6 +38,7 @@ namespace CryptoShark.BlazorServer
         public void ConfigureServices(IServiceCollection services)
         {
             
+            //Auth
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                    Configuration.GetConnectionString("DefaultConnection")));
@@ -47,29 +50,65 @@ namespace CryptoShark.BlazorServer
             services.AddRazorPages();
             services.AddServerSideBlazor();
 
-
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
 
+            //Crypto Api
             services.AddHttpClient("cryptonator", c =>
             {
                 c.BaseAddress = new System.Uri(Configuration.GetValue<string>("CryptoAPI"));
             });
 
+
+            //Data Access
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<ICryptocurrenciesData, CryptocurrenciesData>();
 
+
+            //Hangfire
+            /*
             services.AddHangfire(config =>
                 config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseDefaultTypeSerializer()
             );
+            */
+
+            // Add Hangfire services.
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(Configuration.GetConnectionString("Default"), new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true
+                }));
+
+            services.AddHangfireServer();
+
+
+            //services.AddHangfire(configuration =>
+            //{
+            //    configuration.UseSqlServerStorage(Configuration.GetConnectionString("Default"));
+            //});
+
+            //Syncfusion
+            services.AddSyncfusionBlazor();
+            services.AddSignalR(e => {
+                e.MaximumReceiveMessageSize = 65536;
+            });
+            //For azure
+            //services.AddSignalR(e => { e.MaximumReceiveMessageSize = 65536; }).AddAzureSignalR();
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IBackgroundJobClient backgroundJobs)
         {
             if (env.IsDevelopment())
             {
@@ -96,7 +135,19 @@ namespace CryptoShark.BlazorServer
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapHangfireDashboard();
             });
+
+            //Hangfire
+            app.UseHangfireDashboard();
+
+            HangfireJobs job = new HangfireJobs();
+
+            backgroundJobs.Enqueue(() => job.CallApiAndSave());
+
+
+            //Register syncfusion licence
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Configuration.GetValue<string>("SyncfusionLicence"));
         }
     }
 }

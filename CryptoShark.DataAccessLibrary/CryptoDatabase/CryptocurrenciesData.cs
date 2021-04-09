@@ -1,10 +1,10 @@
-﻿using CryptoShark.CryptoDatabase.DataAccessLibrary;
-using CryptoShark.DataAccessLibrary.Models;
+﻿using CryptoShark.DataAccessLibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary;
 
 namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 {

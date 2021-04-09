@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CryptoShark.CryptoDatabase.DataAccessLibrary
+namespace CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary
 {
     public interface ISqlDataAccess
     {

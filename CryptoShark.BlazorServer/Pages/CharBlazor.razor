@@ -1,0 +1,43 @@
+﻿@page "/chart" 
+@using Syncfusion.Blazor.Charts
+
+<SfChart>
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category">
+    </ChartPrimaryXAxis>
+
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="@StockDetails" XName="X" High="High" Low="Low" Type="ChartSeriesType.Candle" Open="Open" Close="Close">
+        </ChartSeries>
+    </ChartSeriesCollection>
+</SfChart>
+
+@code{
+    public class Data
+    {
+        public string X { get; set; }
+        public double Y { get; set; }
+        public double High { get; set; }
+        public double Low { get; set; }
+        public double Open { get; set; }
+        public double Close { get; set; }
+    }
+
+    public List<Data> StockDetails = new List<Data>
+{
+        new Data{ X= "1", Open= 120, High= 160, Low= 100, Close= 140 },
+        new Data{ X= "2", Open= 150, High= 190, Low= 130, Close= 170 },
+        new Data{ X= "3", Open= 130, High= 170, Low= 110, Close= 150 },
+        new Data{ X= "4", Open= 160, High= 180, Low= 120, Close= 140 },
+        new Data{ X= "5", Open= 150, High= 200, Low= 100, Close= 130 },
+        new Data{ X= "6", Open= 100, High= 270, Low= 110, Close= 130 },
+        new Data{ X= "7", Open= 120, High= 170, Low= 100, Close= 130 },
+        new Data{ X= "8", Open= 110, High= 175, Low= 105, Close= 130 },
+        new Data{ X= "9", Open= 140, High= 180, Low= 100, Close= 130 },
+        new Data{ X= "10", Open= 160, High= 160, Low= 120, Close= 130 },
+        new Data{ X= "11", Open= 170, High= 120, Low= 110, Close= 130 },
+        new Data{ X= "12", Open= 180, High= 150, Low= 130, Close= 130 },
+        new Data{ X= "13", Open= 190, High= 160, Low= 110, Close= 130 },
+        new Data{ X= "14", Open= 170, High= 170, Low= 110, Close= 130 },
+        new Data{ X= "15", Open= 150, High= 180, Low= 105, Close= 130 }
+    };
+}
