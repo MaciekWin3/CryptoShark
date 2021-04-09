@@ -24,8 +24,12 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
         {
             Console.ForegroundColor = ConsoleColor.Red;
             CryptocurrencyModel CryptoModel = new CryptocurrencyModel();
-            string name;
-            double 
+            CryptocurrencySqlModel CryptoSqlModel = new CryptocurrencySqlModel();
+            string nameOfCryptoCurrency;
+            string nameOfCurrency;
+            double price;
+            double volume;
+            double change;
 
 
             using (var data = new WebClient())
@@ -36,12 +40,20 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
                     {
                         string response = data.DownloadString("https://api.cryptonator.com/api/ticker/" + crypto);
                         CryptoModel = JsonConvert.DeserializeObject<CryptocurrencyModel>(response);
-                        price = CryptoModel.Ticker.Price;
+
+
+                        
+                        nameOfCryptoCurrency = CryptoModel.Ticker.Base;
+                        nameOfCurrency = CryptoModel.Ticker.Target;
+                        price = double.Parse(CryptoModel.Ticker.Price);
+                        volume = double.Parse(CryptoModel.Ticker.Volume);
+                        change = double.Parse(CryptoModel.Ticker.Change);
                     }
                     catch (Exception ex)
                     {
                         continue;
                     }
+
 
                     Console.WriteLine(price);
 
