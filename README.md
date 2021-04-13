@@ -1,7 +1,7 @@
 # CryptoShark
 Menadżer zarządzania portelem kryptowalutowym.
 
-![logo](./CryptoShark.BlazorServer/wwwroot/images/crypto.png)
+![logo](CryptoShark.BlazorServer/wwwroot/images/logo.png)
 
 
 ## Stack Technologiczny
