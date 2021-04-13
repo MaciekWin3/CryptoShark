@@ -5,6 +5,7 @@
 @inject IJSRuntime jsRuntime
 @using CryptoShark.DataAccessLibrary.Models;
 
+
 <ChildComponent AlertText=@xd></ChildComponent>
 @if (string.IsNullOrWhiteSpace(errorString) == false)
 {
@@ -83,5 +84,21 @@ else
 
         cryptocurrencies = await _db.GetAllCryptoRecords();
 
+    }
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authStateTask { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authState = await authStateTask;
+
+            var user = authState.User;
+
+            var userId = user.Identity.Name;
+
+        }
     }
 }

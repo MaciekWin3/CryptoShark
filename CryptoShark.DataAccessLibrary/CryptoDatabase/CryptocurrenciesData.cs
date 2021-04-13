@@ -22,13 +22,30 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 
         public static HttpClient ApiClient { get; set; }
 
-        
+
         //{ "btc-usd", "eth-usd", "bnb-usd", "ada-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd"};
 
 
         public Task<List<CryptocurrencySqlModel>> GetAllCryptoRecords()
         {
             string sql = "select * from dbo.Cryptocurrencies";
+
+            return _db.LoadData<CryptocurrencySqlModel, dynamic>(sql, new { });
+        }
+
+        public Task<List<CryptocurrencySqlModel>> GetLastCryptoRecords() //do poprawy, rozwiązanie tymczasowe
+        {
+            string sql = @"/****** Script for SelectTopNRows command from SSMS  ******/
+                        SELECT TOP (10) [id]
+                              ,[base]
+                              ,[currency]
+                              ,[price]
+                              ,[volume]
+                              ,[change]
+                              ,[timestamp]
+                              ,[datetime]
+                          FROM [CryptoShark].[dbo].[Cryptocurrencies]
+                          ORDER BY id DESC";
 
             return _db.LoadData<CryptocurrencySqlModel, dynamic>(sql, new { });
         }
@@ -44,11 +61,6 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 
             return _db.SaveData(sql, crypto);
         }
-
-        
-
-
-            
     }
 }
 

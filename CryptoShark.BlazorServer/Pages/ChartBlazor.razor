@@ -1,11 +1,15 @@
-﻿@page "/chart" 
+﻿@page "/chart"
 @using Syncfusion.Blazor.Charts
+@inject IHttpClientFactory _clientFactory
+@inject ICryptocurrenciesData _db;
+@inject IJSRuntime jsRuntime
+@using CryptoShark.DataAccessLibrary.Models;
 
 
-<div class="container px-1">
+<div class="container">
     <div class="row">
         <div class="col-8">
-            <SfChart Title="Olympic Medals">
+            <SfChart Title="Total Balance">
                 <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
                 <ChartSeriesCollection>
                     <ChartSeries DataSource="@MedalDetails" XName="X" YName="Y" Type="ChartSeriesType.Line">
@@ -14,7 +18,7 @@
             </SfChart>
         </div>
         <div class="col-4">
-            <SfAccumulationChart Title="Mobile Browser Statistics">
+            <SfAccumulationChart Title="Your portfolio">
                 <AccumulationChartSeriesCollection>
                     <AccumulationChartSeries DataSource="@StatisticsDetails" XName="Browser" YName="Users"
                                              Name="Browser" InnerRadius="40%">
@@ -26,17 +30,73 @@
         </div>
     </div>
 </div>
+<div class="container">
+    <div class="row">
+        @if (cryptocurrencies is null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Change</th>
+                        <th scope="col">Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var Crypto in cryptocurrencies)
+                    {
+                    <tr>
+                        <td>@Crypto.Base</td>
+                        <td>@Crypto.Price</td>
+                        @if (@Crypto.Change > 0)
+                        {
+                            <td><p style="color:#18b53c;">@Crypto.Change</p></td>
+                        }
+                        else if (@Crypto.Change == 0)
+                        {
+                            <td><p>@Crypto.Change</p></td>
+                        }
+                        else if (@Crypto.Change < 0)
+                        {
+                            <td><p style="color:red;">@Crypto.Change</p></td>
+                        }
 
-
-
-
-@code{
-    public class ChartData
-    {
-        public string X { get; set; }
-        public double Y { get; set; }
+                        <td>@Crypto.Volume</td>
+                    </tr>
+                    }
+                </tbody>
+                </table>
     }
-    public List<ChartData> MedalDetails = new List<ChartData>
+
+    </div>
+    </div>
+
+
+
+    @code{
+
+        private List<CryptocurrencySqlModel> cryptocurrencies;
+
+        protected override async Task OnInitializedAsync()
+        {
+            //Db call
+
+            cryptocurrencies = await _db.GetLastCryptoRecords();
+
+        }
+
+
+        public class ChartData
+        {
+            public string X { get; set; }
+            public double Y { get; set; }
+        }
+        public List<ChartData> MedalDetails = new List<ChartData>
 {
         new ChartData { X= "South Korea", Y= 39.4 },
         new ChartData { X= "India", Y= 61.3 },
@@ -52,13 +112,13 @@
         new ChartData { X= "China", Y= 51.4 }
     };
 
-    public class Statistics
-    {
-        public string Browser { get; set; }
-        public double Users { get; set; }
-    }
+        public class Statistics
+        {
+            public string Browser { get; set; }
+            public double Users { get; set; }
+        }
 
-    public List<Statistics> StatisticsDetails = new List<Statistics>
+        public List<Statistics> StatisticsDetails = new List<Statistics>
 {
         new Statistics { Browser = "Chrome", Users = 37 },
         new Statistics { Browser = "UC Browser", Users = 17 },
@@ -67,4 +127,6 @@
         new Statistics { Browser = "Opera", Users = 11 },
         new Statistics { Browser = "Android", Users = 12 },
     };
-}
+
+
+    }

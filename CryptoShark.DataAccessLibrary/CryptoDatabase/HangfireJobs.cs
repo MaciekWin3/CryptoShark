@@ -21,7 +21,6 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 {
     public class HangfireJobs
     {
-
         public static void CallApiAndSave(string connectionString)
         {
             string[] CryptoList = new string[10]
@@ -38,7 +37,6 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 
             foreach (string element in CryptoList)
             {
-
                 using (var data = new WebClient())
                 {
                     string response = data.DownloadString("https://api.cryptonator.com/api/ticker/" + element);

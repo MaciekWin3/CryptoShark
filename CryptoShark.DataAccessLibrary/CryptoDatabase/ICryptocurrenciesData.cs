@@ -7,6 +7,7 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
     public interface ICryptocurrenciesData
     {
         Task<List<CryptocurrencySqlModel>> GetAllCryptoRecords();
+        Task<List<CryptocurrencySqlModel>> GetLastCryptoRecords();
         Task InsertCryptoData(CryptocurrencySqlModel crypto);
     }
 }
