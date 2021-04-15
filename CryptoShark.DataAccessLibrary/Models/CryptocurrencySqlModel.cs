@@ -17,6 +17,6 @@ namespace CryptoShark.DataAccessLibrary.Models
         public double Volume { get; set; }
         public double Change { get; set; }
         public int Timestamp { get; set; }
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
     }
 }

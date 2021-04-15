@@ -1,42 +1,30 @@
 ﻿using CryptoShark.DataAccessLibrary.Models;
-using CryptoShark.DataAccessLibrary;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary;
-using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Configuration;
 using Dapper;
 using System.Threading.Tasks;
-using System.Data.SqlTypes;
 using System.Globalization;
+
 
 namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 {
     public class HangfireJobs
     {
-        public static void CallApiAndSave(string connectionString)
+        public static async Task CallApiAndSave(string connectionString)
         {
             string[] CryptoList = new string[10]
-            { "btc-usd", "eth-usd", "bnb-usd", "ada-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd"};
-
-            Console.ForegroundColor = ConsoleColor.Red;
+            { "btc-usd", "eth-usd", "bnb-usd", "etc-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd"};           
            
-            DateTime myDateTime = DateTime.Now;
-            string sqlFormattedDate = myDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
-
-            
+            DateTime myDateTime = DateTime.Now;           
             CryptocurrencyModel CryptoModel;
             CryptocurrencySqlModel CryptoSqlModel = new CryptocurrencySqlModel();
 
             foreach (string element in CryptoList)
             {
+                await Task.Delay(1000);
                 using (var data = new WebClient())
                 {
                     string response = data.DownloadString("https://api.cryptonator.com/api/ticker/" + element);
@@ -48,24 +36,33 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
                     CryptoSqlModel.Volume = Double.Parse(CryptoModel.Ticker.Volume, CultureInfo.InvariantCulture);
                     CryptoSqlModel.Change = Double.Parse(CryptoModel.Ticker.Change, CultureInfo.InvariantCulture);
                     CryptoSqlModel.Timestamp = CryptoModel.Timestamp;
-                    CryptoSqlModel.Date = sqlFormattedDate;
+                    CryptoSqlModel.Date = myDateTime;
 
                     using (IDbConnection db = new SqlConnection(connectionString))
                     {
                         string sql = @"insert into [dbo].[Cryptocurrencies]
                                 ([base], [currency], [price], [volume], [change], [timestamp], [datetime] )
-                                values (@Base, @Target, @Price, @Volume, @Change, @Timestamp, @date);";
+                                values (@Base, @Target, @Price, @Volume, @Change, @Timestamp, @Date);";
 
-                        var result = db.Execute(sql, new
+                        try
                         {
-                            CryptoSqlModel.Base,
-                            CryptoSqlModel.Target,
-                            CryptoSqlModel.Price,
-                            CryptoSqlModel.Volume,
-                            CryptoSqlModel.Change,
-                            CryptoSqlModel.Timestamp,
-                            CryptoSqlModel.Date
-                        });
+                            var result = db.Execute(sql, new
+                            {
+                                CryptoSqlModel.Base,
+                                CryptoSqlModel.Target,
+                                CryptoSqlModel.Price,
+                                CryptoSqlModel.Volume,
+                                CryptoSqlModel.Change,
+                                CryptoSqlModel.Timestamp,
+                                CryptoSqlModel.Date
+                            });
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Error with {0}", CryptoSqlModel.Base);
+                        }
+                        
                     }
                 }
             }

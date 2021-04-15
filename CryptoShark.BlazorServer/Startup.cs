@@ -15,12 +15,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Syncfusion.Blazor;
 using Hangfire.SqlServer;
 using CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary;
+using Blazored.Modal;
+
 
 namespace CryptoShark.BlazorServer
 {
@@ -104,6 +103,9 @@ namespace CryptoShark.BlazorServer
             });
             //For azure
             //services.AddSignalR(e => { e.MaximumReceiveMessageSize = 65536; }).AddAzureSignalR();
+
+            //Modals
+            services.AddBlazoredModal();
 
         }
 

@@ -7,16 +7,21 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
+    <PackageReference Include="Blazored.Modal" Version="6.0.1" />
     <PackageReference Include="bunit" Version="1.0.0-preview-02" />
     <PackageReference Include="Hangfire.AspNetCore" Version="1.8.0-beta1" />
     <PackageReference Include="Hangfire.Core" Version="1.8.0-beta1" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.0-beta1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Syncfusion.Blazor" Version="19.1.0.55" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
@@ -26,11 +31,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CryptoShark.DataAccessLibrary\CryptoShark.DataAccessLibrary.csproj" />
-  </ItemGroup>
-    
-
-  <ItemGroup>
-    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

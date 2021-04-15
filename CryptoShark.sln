@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoShark.BlazorServer", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoShark.DataAccessLibrary", "CryptoShark.DataAccessLibrary\CryptoShark.DataAccessLibrary.csproj", "{C573666F-FA22-4B36-80E2-05C3CF4C43BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoShark.Tests", "CryptoShark.Tests\CryptoShark.Tests.csproj", "{04692C1A-1B20-486B-BADC-30BCD3AD4F75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoShark.Tests", "CryptoShark.Tests\CryptoShark.Tests.csproj", "{04692C1A-1B20-486B-BADC-30BCD3AD4F75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
