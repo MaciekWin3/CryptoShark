@@ -1,5 +1,7 @@
-﻿<h3>Movies</h3>
+﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Identity;
 
-@code {
+@inject IHttpContextAccessor httpContextAccessor
+@inject UserManager<IdentityUser> UserManager
 
-}
+<p>tu coś bedzie</p>

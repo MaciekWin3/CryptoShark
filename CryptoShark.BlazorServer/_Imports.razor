@@ -19,3 +19,8 @@
 @using Syncfusion.Blazor.Charts
 @using Blazored.Modal
 @using Blazored.Modal.Services
+@using System.Security.Claims
+@inject ICryptocurrenciesData _db
+@inject IHangfireJobs db
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using CryptoShark.DataAccessLibrary.Models

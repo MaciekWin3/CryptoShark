@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using System.Data;
@@ -13,7 +11,7 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary
     public class SqlDataAccess : ISqlDataAccess
     {
         private readonly IConfiguration _config;
-        public string ConnectionStringName { get; set; } = "Default";
+        public string ConnectionStringName { get; set; } = "DefaultConnection";
         public SqlDataAccess(IConfiguration config)
         {
             _config = config;
@@ -30,6 +28,8 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary
                 return data.ToList();
             }
         }
+
+
 
         public async Task SaveData<T>(string sql, T parameters)
         {

@@ -63,6 +63,7 @@ namespace CryptoShark.BlazorServer
             //Data Access
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<ICryptocurrenciesData, CryptocurrenciesData>();
+            services.AddTransient<IHangfireJobs, HangfireJobs>();
 
 
             //Hangfire
@@ -79,7 +80,7 @@ namespace CryptoShark.BlazorServer
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(Configuration.GetConnectionString("Default"), new SqlServerStorageOptions
+                .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
                 {
                     CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
                     SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
@@ -148,7 +149,7 @@ namespace CryptoShark.BlazorServer
 
             HangfireJobs Hangfire = new HangfireJobs();
 
-            RecurringJob.AddOrUpdate(() => HangfireJobs.CallApiAndSave(Configuration.GetConnectionString("Default")), Cron.Hourly);
+            RecurringJob.AddOrUpdate(() => HangfireJobs.CallApiAndSave(Configuration.GetConnectionString("DefaultConnection")), Cron.Minutely);
 
 
             //Register syncfusion licence

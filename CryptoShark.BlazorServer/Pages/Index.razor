@@ -1,9 +1,11 @@
 ﻿@page "/"
 @using Syncfusion.Blazor.Charts
+@using System.Globalization;
+@inject ICryptocurrenciesData _db
+@inject IHangfireJobs db
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AuthenticationStateProvider GetAuthenticationStateAsync
 @inject IHttpClientFactory _clientFactory
-@inject ICryptocurrenciesData _db;
-@inject IJSRuntime jsRuntime
-@using CryptoShark.DataAccessLibrary.Models;
 
 
 <div class="container">
@@ -20,12 +22,12 @@
         <div class="col-4">
             <SfAccumulationChart Title="Your portfolio">
                 <AccumulationChartSeriesCollection>
-                    <AccumulationChartSeries DataSource="@StatisticsDetails" XName="Browser" YName="Users"
-                                             Name="Browser" InnerRadius="40%">
+                    <AccumulationChartSeries DataSource="@StatisticsDetails" XName="Cryptocurrency" YName="Amount"
+                                             Name="Amount" InnerRadius="40%">
                     </AccumulationChartSeries>
                 </AccumulationChartSeriesCollection>
 
-                <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
+                <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
             </SfAccumulationChart>
         </div>
     </div>
@@ -52,26 +54,26 @@
                 <tbody>
                     @foreach (var Crypto in cryptocurrencies)
                     {
-                    <tr>
-                        <td><a>@Crypto.Base</a></td>
-                        <td>@Crypto.Price</td>
-                        @if (@Crypto.Change > 0)
-                        {
-                            <td><p style="color:#18b53c;">@Crypto.Change</p></td>
-                        }
-                        else if (@Crypto.Change == 0)
-                        {
-                            <td><p>@Crypto.Change</p></td>
-                        }
-                        else if (@Crypto.Change < 0)
-                        {
-                            <td><p style="color:red;">@Crypto.Change</p></td>
-                        }
+                        <tr>
+                            <td><a>@Crypto.Base</a></td>
+                            <td>@Crypto.Price</td>
+                            @if (@Crypto.Change > 0)
+                            {
+                                <td><p style="color:#18b53c;">@Crypto.Change</p></td>
+                            }
+                            else if (@Crypto.Change == 0)
+                            {
+                                <td><p>@Crypto.Change</p></td>
+                            }
+                            else if (@Crypto.Change < 0)
+                            {
+                                <td><p style="color:red;">@Crypto.Change</p></td>
+                            }
 
-                        <td>@Crypto.Volume</td>
-                        <td><button type="button" @onclick="@(() => Modal.Show<Movies>("My Movies"))" class="btn btn-success">   +   </button></td>
-                        <td><button type="button" @onclick="@(() => Modal.Show<Movies>("My Movies"))" class="btn btn-danger">   -   </button></td>
-                    </tr>
+                            <td>@Crypto.Volume</td>
+                            <td><button type="button" @onclick="@(() => Modal.Show<Movies>("My Movies"))" class="btn btn-success">   +   </button></td>
+                            <td><button type="button" @onclick="@(() => Modal.Show<Movies>("My Movies"))" class="btn btn-danger">   -   </button></td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -79,6 +81,8 @@
 
     </div>
 </div>
+<p>@id</p>
+<p>@bitcoin</p>
 
 
 
@@ -87,6 +91,35 @@
     [CascadingParameter] public IModalService Modal { get; set; }
 
     private List<CryptocurrencySqlModel> cryptocurrencies;
+    public string username;
+
+    public int id = 0;
+
+    public double bitcoin = 0;
+    public double ethereum = 0;
+    public double binancecoin = 0;
+    public double polkadot = 0;
+    public double chainlink = 0;
+    public double monero = 0;
+    public double dash = 0;
+    public double zillqa = 0;
+    public double ravencoin = 0;
+    public double etherumclassic = 0;
+
+    string errorString;
+    CryptocurrencyModel crypto;
+
+    public static double bitcoinAmonutWithActualPrice = 0;
+    public static double ethereumAmonutWithActualPrice = 0;
+    public static double binancecoinAmonutWithActualPrice = 0;
+    public static double polkadotAmonutWithActualPrice = 0;
+    public static double chainlinkAmonutWithActualPrice = 0;
+    public static double moneroAmonutWithActualPrice = 0;
+    public static double dashAmonutWithActualPrice = 0;
+    public static double zillqaAmonutWithActualPrice = 0;
+    public static double ravencoinAmonutWithActualPrice = 0;
+    public static double etherumclassicAmonutWithActualPrice = 0;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,6 +127,47 @@
 
         cryptocurrencies = await _db.GetLastCryptoRecords();
 
+        var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
+        var user = authstate.User;
+        username = user.Identity.Name;
+
+        if (username != null)
+        {
+            var userdata = db.Find(username);
+            id = userdata.Id;
+            bitcoin = userdata.Bitcoin;
+            ethereum = userdata.Ethereum;
+            binancecoin = userdata.BinanceCoin;
+            polkadot = userdata.Polkadot;
+            chainlink = userdata.Chainlink;
+            monero = userdata.Monero;
+            dash = userdata.Dash;
+            zillqa = userdata.Zilliqa;
+            ravencoin = userdata.RavenCoin;
+            etherumclassic = userdata.EtherumClassic;
+        }
+
+
+        //Api call
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            "btc-usd");
+
+        var client = _clientFactory.CreateClient("cryptonator");
+
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            crypto = await response.Content.ReadFromJsonAsync<CryptocurrencyModel>();
+            //date = DateTimeOffset.FromUnixTimeSeconds(crypto.Timestamp + 3600);
+            errorString = null;
+        }
+        else
+        {
+            errorString = $"There was an error : { response.ReasonPhrase }";
+        }
+
+        bitcoinAmonutWithActualPrice = bitcoin * Double.Parse(crypto.Ticker.Price, CultureInfo.InvariantCulture); ;
     }
 
 
@@ -102,6 +176,7 @@
         public string X { get; set; }
         public double Y { get; set; }
     }
+
     public List<ChartData> MedalDetails = new List<ChartData>
 {
         new ChartData { X= "South Korea", Y= 39.4 },
@@ -120,18 +195,22 @@
 
     public class Statistics
     {
-        public string Browser { get; set; }
-        public double Users { get; set; }
+        public string Cryptocurrency { get; set; }
+        public double Amount { get; set; }
     }
 
     public List<Statistics> StatisticsDetails = new List<Statistics>
 {
-        new Statistics { Browser = "Chrome", Users = 37 },
-        new Statistics { Browser = "UC Browser", Users = 17 },
-        new Statistics { Browser = "iPhone", Users = 19 },
-        new Statistics { Browser = "Others", Users = 4  },
-        new Statistics { Browser = "Opera", Users = 11 },
-        new Statistics { Browser = "Android", Users = 12 },
+        new Statistics { Cryptocurrency = "Bitcoin", Amount = bitcoinwithprice },
+        new Statistics { Cryptocurrency = "Ethereum", Amount = ethereum },
+        new Statistics { Cryptocurrency = "BinanceCoin", Amount = binancecoin },
+        new Statistics { Cryptocurrency = "Polkadot", Amount = polkadot  },
+        new Statistics { Cryptocurrency = "Chainlink", Amount = chainlink },
+        new Statistics { Cryptocurrency = "Monero", Amount = monero },
+        new Statistics { Cryptocurrency = "Dash", Amount = dash },
+        new Statistics { Cryptocurrency = "Zilliqa", Amount = zillqa },
+        new Statistics { Cryptocurrency = "RavenCoin", Amount = ravencoin },
+        new Statistics { Cryptocurrency = "EtherumClassic", Amount = etherumclassic }
     };
 
 

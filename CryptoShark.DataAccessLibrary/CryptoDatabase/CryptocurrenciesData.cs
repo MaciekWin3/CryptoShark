@@ -8,6 +8,10 @@ using CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Net;
+using System.Data.SqlClient;
+using System.Data;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 {
@@ -15,12 +19,12 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
     {
         private readonly ISqlDataAccess _db;
 
+
+
         public CryptocurrenciesData(ISqlDataAccess db)
         {
             _db = db;
         }
-
-        public static HttpClient ApiClient { get; set; }
 
 
         //{ "btc-usd", "eth-usd", "bnb-usd", "ada-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd"};
@@ -28,10 +32,31 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 
         public Task<List<CryptocurrencySqlModel>> GetAllCryptoRecords()
         {
-            string sql = "select * from dbo.Cryptocurrencies";
+            string sql = @"select * from dbo.Cryptocurrencies";
 
             return _db.LoadData<CryptocurrencySqlModel, dynamic>(sql, new { });
         }
+
+        public Task<List<UserDataModel>> GetAllUsers(string name)
+        {
+            string sql = "select * from dbo.UserData";
+
+
+            var dane = _db.LoadData<UserDataModel, dynamic>(sql, new { });
+            if(dane == null)
+            {
+                Console.WriteLine("tu nikogo nie ma!");
+            }
+            else
+            {
+                
+                Console.WriteLine(dane.ToString());
+            }
+
+            return _db.LoadData<UserDataModel, dynamic>(sql, new { });
+        }
+
+
 
         public Task<List<CryptocurrencySqlModel>> GetLastCryptoRecords() //do poprawy, rozwiązanie tymczasowe
         {
@@ -44,7 +69,7 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
                               ,[change]
                               ,[timestamp]
                               ,[datetime]
-                          FROM [CryptoShark].[dbo].[Cryptocurrencies]
+                          FROM [CryptoSharkAuth].[dbo].[Cryptocurrencies]
                           ORDER BY id DESC";
 
             return _db.LoadData<CryptocurrencySqlModel, dynamic>(sql, new { });
@@ -61,6 +86,68 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 
             return _db.SaveData(sql, crypto);
         }
+
+        public static async Task CreateUserData(string id, string email)
+        {
+
+            await Task.Delay(1000);
+
+            DateTime myDateTime = DateTime.Now;
+
+            UserDataModel newUser = new UserDataModel();
+
+            newUser.UserId = id;
+            newUser.Email = email;
+            newUser.Bitcoin = 0;
+            newUser.Ethereum = 0;
+            newUser.BinanceCoin = 0;
+            newUser.Polkadot = 0;
+            newUser.Chainlink = 0;
+            newUser.Monero = 0;
+            newUser.Dash = 0;
+            newUser.Zilliqa = 0;
+            newUser.RavenCoin = 0;
+            newUser.EtherumClassic = 0;
+            newUser.Date = myDateTime;
+
+            using (IDbConnection db = new SqlConnection("Data Source=.\\sqlexpress;Initial Catalog=CryptoSharkAuth;Integrated Security=True;Trusted_Connection=True;MultipleActiveResultSets=true"))
+            {
+                string sql = @"insert into [dbo].[UserData]
+                                ([userId], [email], [bitcoin], [ethereum], [binancecoin], [polkadot], [chainlink],[monero],
+                                [dash], [zilliqa], [ravencoin], [etherumclassic], [save])
+                                values (@UserId, @Email, @Bitcoin, @Ethereum, @BinanceCoin, @Polkadot, @Chainlink, @Monero,
+                                @Dash, @Zilliqa, @RavenCoin, @EtherumClassic, @Date);";
+
+                try
+                {
+                    var result = db.Execute(sql, new
+                    {
+                        newUser.UserId,
+                        newUser.Email,
+                        newUser.Bitcoin,
+                        newUser.Ethereum,
+                        newUser.BinanceCoin,
+                        newUser.Polkadot,
+                        newUser.Chainlink,
+                        newUser.Monero,
+                        newUser.Dash,
+                        newUser.Zilliqa,
+                        newUser.RavenCoin,
+                        newUser.EtherumClassic,
+                        newUser.Date
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error with {0}", ex.Message);
+                }
+
+            }
+
+        }
+
+
     }
 }
 
