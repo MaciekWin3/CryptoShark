@@ -64,7 +64,7 @@ namespace CryptoShark.BlazorServer
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<ICryptocurrenciesData, CryptocurrenciesData>();
             services.AddTransient<IHangfireJobs, HangfireJobs>();
-
+            services.AddTransient<IDapperSqlDataAccess, DapperSqlDataAccess>();
 
             //Hangfire
             /*
@@ -149,7 +149,9 @@ namespace CryptoShark.BlazorServer
 
             HangfireJobs Hangfire = new HangfireJobs();
 
-            RecurringJob.AddOrUpdate(() => HangfireJobs.CallApiAndSave(Configuration.GetConnectionString("DefaultConnection")), Cron.Minutely);
+            RecurringJob.AddOrUpdate(() => HangfireJobs.CallApiAndSave(Configuration.GetConnectionString("DefaultConnection")), Cron.Hourly);
+            RecurringJob.AddOrUpdate(() => HangfireJobs.SaveUserData(Configuration.GetConnectionString("DefaultConnection")), Cron.Hourly);
+
 
 
             //Register syncfusion licence

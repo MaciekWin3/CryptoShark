@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 {
@@ -26,11 +27,11 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 
         }
 
-        public UserDataModel Find(string Email)
+        public void ReturnZero()
         {
-            var sql = "SELECT * FROM UserData WHERE Email = @Email";
-            return db.Query<UserDataModel>(sql, new { @Email = Email }).Single();
+            Console.WriteLine("0");
         }
+
 
         public static async Task CallApiAndSave(string connectionString)
         {
@@ -95,8 +96,85 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
                     }
                 }
             }
+        }       
+
+        public static async  Task SaveUserData(string connectionString)
+        {
+            await Task.Delay(100);
+            using (IDbConnection db = new SqlConnection("Data Source=.\\sqlexpress;Initial Catalog=CryptoSharkAuth;Integrated Security=True;Trusted_Connection=True;MultipleActiveResultSets=true"))
+            {
+                string sql = @"insert into [dbo].[UserData]
+                                ([userId], [email], [bitcoin], [ethereum], [binancecoin], [polkadot], [chainlink],[monero],
+                                [dash], [zilliqa], [ravencoin], [etherumclassic], [save])
+                                select distinct [userId], [email], [bitcoin], [ethereum], [binancecoin], [polkadot], [chainlink],[monero],
+                                [dash], [zilliqa], [ravencoin], [etherumclassic], getdate() from UserData;";
+
+                db.Execute(sql);
+                
+
+            }
+
         }
 
+        public static async Task CreateUserData(string id, string email)
+        {
+
+            await Task.Delay(1000);
+
+            DateTime myDateTime = DateTime.Now;
+
+            UserDataModel newUser = new UserDataModel();
+
+            newUser.UserId = id;
+            newUser.Email = email;
+            newUser.Bitcoin = 0;
+            newUser.Ethereum = 0;
+            newUser.BinanceCoin = 0;
+            newUser.Polkadot = 0;
+            newUser.Chainlink = 0;
+            newUser.Monero = 0;
+            newUser.Dash = 0;
+            newUser.Zilliqa = 0;
+            newUser.RavenCoin = 0;
+            newUser.EtherumClassic = 0;
+            newUser.Date = myDateTime;
+
+            using (IDbConnection db = new SqlConnection("Data Source=.\\sqlexpress;Initial Catalog=CryptoSharkAuth;Integrated Security=True;Trusted_Connection=True;MultipleActiveResultSets=true"))
+            {
+                string sql = @"insert into [dbo].[UserData]
+                                ([userId], [email], [bitcoin], [ethereum], [binancecoin], [polkadot], [chainlink],[monero],
+                                [dash], [zilliqa], [ravencoin], [etherumclassic], [save])
+                                values (@UserId, @Email, @Bitcoin, @Ethereum, @BinanceCoin, @Polkadot, @Chainlink, @Monero,
+                                @Dash, @Zilliqa, @RavenCoin, @EtherumClassic, @Date);";
+
+                try
+                {
+                    var result = db.Execute(sql, new
+                    {
+                        newUser.UserId,
+                        newUser.Email,
+                        newUser.Bitcoin,
+                        newUser.Ethereum,
+                        newUser.BinanceCoin,
+                        newUser.Polkadot,
+                        newUser.Chainlink,
+                        newUser.Monero,
+                        newUser.Dash,
+                        newUser.Zilliqa,
+                        newUser.RavenCoin,
+                        newUser.EtherumClassic,
+                        newUser.Date
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error with {0}", ex.Message);
+                }
+
+            }
+
+        }
 
 
     }

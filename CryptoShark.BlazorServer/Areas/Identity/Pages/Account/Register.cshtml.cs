@@ -86,7 +86,7 @@ namespace CryptoShark.BlazorServer.Areas.Identity.Pages.Account
                 //UserData
                 
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                await CryptocurrenciesData.CreateUserData(user.Id, user.Email);
+                await HangfireJobs.CreateUserData(user.Id, user.Email);
                 
 
 

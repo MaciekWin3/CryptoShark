@@ -1,5 +1,5 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">CryptoShark.BlazorServer</a>
+﻿<div class="top-row pl-4 navbar navbar-dark justify-content-center">
+    <a class="navbar-brand" href="">CryptoShark</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -34,6 +34,12 @@
         </li>
     </ul>
 </div>
+
+<style>
+    img {
+        max-width: 50px;
+    }
+</style>
 
 @code {
     private bool collapseNavMenu = true;

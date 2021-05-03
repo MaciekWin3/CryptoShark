@@ -1,8 +1,13 @@
 ﻿@page "/"
+@attribute [Authorize]
 @using Syncfusion.Blazor.Charts
 @using System.Globalization;
+@using System.Dynamic
+
+@inject IDapperSqlDataAccess DapperDb
 @inject ICryptocurrenciesData _db
-@inject IHangfireJobs db
+@inject IHangfireJobs HangfireDb
+
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject AuthenticationStateProvider GetAuthenticationStateAsync
 @inject IHttpClientFactory _clientFactory
@@ -71,8 +76,8 @@
                             }
 
                             <td>@Crypto.Volume</td>
-                            <td><button type="button" @onclick="@(() => Modal.Show<Movies>("My Movies"))" class="btn btn-success">   +   </button></td>
-                            <td><button type="button" @onclick="@(() => Modal.Show<Movies>("My Movies"))" class="btn btn-danger">   -   </button></td>
+                            <td><button type="button" @onclick="@(() => ShowEditUserData(username, Crypto.Base))" class="btn btn-success">   +   </button></td>
+                            <td><button type="button" @onclick="@(() => ShowEditUserData(username, Crypto.Base))" class="btn btn-danger">   -   </button></td>
                         </tr>
                     }
                 </tbody>
@@ -92,9 +97,20 @@
 
     [CascadingParameter] public IModalService Modal { get; set; }
 
+    //public List<ExpandoObject> MedalDetails { get; set; } = new List<ExpandoObject>();
+
+    void ShowEditUserData(string username, string Base)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(EditUserData.Username), username);
+        parameters.Add(nameof(EditUserData.Base), Base);
+
+        Modal.Show<EditUserData>("Crypto Manager", parameters);
+    }
+
 
     string[] CryptoList = new string[10]
-    { "btc-usd", "eth-usd", "bnb-usd", "etc-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd"};
+    { "btc-usd", "eth-usd", "bnb-usd", "etc-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd"}; // kolejnosc?
 
     //public static Dictionary<string, double> PricesAndAmount = new Dictionary<string, double>();
 
@@ -106,6 +122,7 @@
     double[] Amount = new double[10];
 
     private List<CryptocurrencySqlModel> cryptocurrencies;
+    private List<UserDataModel> LineChartData;
 
 
 
@@ -143,15 +160,21 @@
     {
         //Db call
 
-        cryptocurrencies = await _db.GetLastCryptoRecords();
+        //cryptocurrencies = await _db.GetLastCryptoRecords();
+
+        cryptocurrencies = DapperDb.GetLastCryptoRecords();
+
 
         var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
         var user = authstate.User;
         username = user.Identity.Name;
 
+
         if (username != null)
         {
-            var userdata = db.Find(username);
+
+            LineChartData = DapperDb.GetAllUserDataForUser(username);
+            var userdata = DapperDb.GetLastUserDataModel(username); //email
             id = userdata.Id;
 
             bitcoin = userdata.Bitcoin;
@@ -163,30 +186,32 @@
             binancecoin = userdata.BinanceCoin;
             Amount[2] = binancecoin;
 
+            etherumclassic = userdata.EtherumClassic;
+            Amount[3] = etherumclassic;
+
             polkadot = userdata.Polkadot;
-            Amount[3] = polkadot;
+            Amount[4] = polkadot;
 
             chainlink = userdata.Chainlink;
-            Amount[4] = chainlink;
+            Amount[5] = chainlink;
 
             monero = userdata.Monero;
-            Amount[5] = monero;
+            Amount[6] = monero;
 
             dash = userdata.Dash;
-            Amount[6] = bitcoin;
-
-            zillqa = userdata.Zilliqa;
             Amount[7] = dash;
 
-            ravencoin = userdata.RavenCoin;
-            Amount[8] = ravencoin;
+            zillqa = userdata.Zilliqa;
+            Amount[8] = zillqa;
 
-            etherumclassic = userdata.EtherumClassic;
-            Amount[9] = etherumclassic;
+            ravencoin = userdata.RavenCoin;
+            Amount[9] = ravencoin;
+
+
         }
 
 
-        for(int i = 0; i < CryptoList.Length; i++)
+        for (int i = 0; i < CryptoList.Length; i++)
         {
             //Api call
             var request = new HttpRequestMessage(HttpMethod.Get,
@@ -215,7 +240,6 @@
 
     }
 
-
     public class ChartData
     {
         public string X { get; set; }
@@ -237,6 +261,8 @@
         new ChartData { X= "Brazil", Y= 75.9 },
         new ChartData { X= "China", Y= 51.4 }
     };
+
+
 
     public class Statistics
     {

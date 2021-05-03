@@ -7,10 +7,11 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 {
-    class DapperSqlDataAccess
+    public class DapperSqlDataAccess : IDapperSqlDataAccess
     {
         private IDbConnection db;
         public DapperSqlDataAccess(IConfiguration configuration)
@@ -20,18 +21,63 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 
         //UserData
 
-        public UserDataModel Find(string Email)
+        public UserDataModel AddUserDataModel(UserDataModel user)
         {
-            var sql = "SELECT * FROM UserData WHERE Email = @Email";
+            throw new NotImplementedException();
+        }
+
+        public UserDataModel FindUserDataModelByEmail(string Email)
+        {
+            var sql = "SELECT top 1 * FROM UserData WHERE Email = @Email order by id desc";
             return db.Query<UserDataModel>(sql, new { @Email = Email }).Single();
         }
 
-        public List<UserDataModel> GetAll()
+        public List<UserDataModel> GetAllUserDataForUser(string Email)
+        {
+            var sql = "SELECT * FROM UserData WHERE Email = @Email";
+            return db.Query<UserDataModel>(sql, new { @Email = Email }).ToList();
+        }
+
+        public List<UserDataModel> GetAllLastUserDataModel()
         {
             var sql = "SELECT * FROM UserData";
             return db.Query<UserDataModel>(sql).ToList();
         }
 
+        public UserDataModel UpdateCurrencyFromLastUserDataModel(string Email, string currency, double amount, string operation)
+        {
+            if(currency == "RVN")
+            {
+                currency = "ravencoin";
+            }
+            var sql = "";
+            if (operation == "Add")
+            {
+                sql = "Update UserData set " + currency + " = " + currency + " + " + amount + " select top 1 * FROM UserData where Email = @Email ORDER BY id";
+            }
+            else
+            {
+                sql = "Update UserData set " + currency + " = " + currency + " + " + amount + " select top 1 * FROM UserData where Email = @Email ORDER BY id";
+            }
+
+            return db.Query<UserDataModel>(sql, new { @Email = Email }).Single();
+        }
+
+        public UserDataModel GetLastUserDataModel(string Email)
+        {
+            var sql = @"select top 1  * from UserData
+                        where[save] = (select max([save]) from UserData) and Email = @Email
+                        order by id desc";
+            return db.Query<UserDataModel>(sql, new { @Email = Email }).Single();
+        }
+
+
+
+        public List<CryptocurrencySqlModel> GetLastCryptoRecords()
+        {
+            var sql = "select * from Cryptocurrencies where id IN (SELECT MAX(id) FROM Cryptocurrencies GROUP BY base)";
+            return db.Query<CryptocurrencySqlModel>(sql).ToList();
+        }
 
     }
 }

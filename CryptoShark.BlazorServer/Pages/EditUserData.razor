@@ -1,0 +1,40 @@
+﻿@inject IDapperSqlDataAccess DapperDb
+@using CryptoShark.BlazorServer.Models
+
+<EditForm Model="@Amount" OnValidSubmit="@UpdateValue">
+    <p>
+        <label>Amount</label>
+        <InputNumber @bind-Value="Amount.Amount"></InputNumber>
+       
+    </p>
+    <button type="submit"></button>
+</EditForm>
+
+<p>@Username</p>
+<p>@Base</p>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Parameter] public string Username { get; set; }
+    [Parameter] public string Base { get; set; }
+
+    UserDataModel UserData { get; set; }
+
+    private AmountModel Amount = new AmountModel();
+
+
+    protected override void OnInitialized()
+    {
+        UserData = DapperDb.FindUserDataModelByEmail(Username);
+    }
+
+    void UpdateValue()
+    {
+        //MovieService.Save(Movie);
+        DapperDb.UpdateCurrencyFromLastUserDataModel(Username, Base, Amount.Amount, "Add" );
+        ModalInstance.CloseAsync(ModalResult.Ok<UserDataModel>(UserData));
+    }
+
+}

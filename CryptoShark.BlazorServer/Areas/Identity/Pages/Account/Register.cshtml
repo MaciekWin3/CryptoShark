@@ -1,70 +1,104 @@
 ﻿@page
 @model RegisterModel
-@{
-    ViewData["Title"] = "Register";
-}
 
-<h1>@ViewData["Title"]</h1>
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h4>Create a new account.</h4>
-            <hr />
-            <div asp-validation-summary="All" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Input.Email"></label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.Password"></label>
-                <input asp-for="Input.Password" class="form-control" />
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.ConfirmPassword"></label>
-                <input asp-for="Input.ConfirmPassword" class="form-control" />
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h4>Use another service to register.</h4>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
-                            for details on setting up this ASP.NET application to support logging in via external services.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
-    </div>
+<div class="d-flex justify-content-center align-items-center login-container">
+    <form id="account" method="post" class="login-form text-center" asp-route-returnUrl="@Model.ReturnUrl">
+        <img src="~/images/logo.png" alt="logo" />
+        <h1 class="mb-5 font-weight-light text-uppercase">Register</h1>
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <input asp-for="Input.Email" class="form-control rounded-pill form-control-lg" placeholder="Username" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input asp-for="Input.Password" type="password" class="form-control rounded-pill form-control-lg" placeholder="Password" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input asp-for="Input.ConfirmPassword" class="form-control rounded-pill form-control-lg" placeholder="Confirm Password" />
+            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn mt-5 rounded-pill btn-lg btn-custom btn-block text-uppercase">Register</button>
+    </form>
 </div>
 
 <style>
 
+    img{
+        max-width: 300px;
+    }
 
+    body {
+        font-family: 'Poppins', sans-serif;
+        font-size: 16px;
+        color: #666;
+    }
+
+    .login-container {
+        height: 100vh;
+        width: 100%;
+    }
+
+    .forgot-link a {
+        font-size: 1.2em;
+    }
+
+    .login-form {
+        margin: auto;
+        width: 370px;
+        padding: 15px;
+        max-width: 100%;
+    }
+
+    .login-form .form-control {
+        font-size: 15px;
+        min-height: 48px;
+        font-weight: 500;
+    }
+
+    .login-form a {
+        text-decoration: none;
+        color: #666;
+    }
+
+    .login-form a:hover {
+        color: #723dbe;
+    }
+
+    .forgot-link {
+        font-size: 13px;
+    }
+
+    .form-control:focus {
+        border-color: #723dbe;
+        box-shadow: 0 0 0 0.2rem rgba(114,61,190,.25);
+    }
+
+    .btn-custom {
+        background: #00ccff;
+        border-color: #00ccff;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        min-height: 48px;
+    }
+
+    #makebigger {
+        font-size: 1.2em;
+    }
+
+    .btn-custom:focus,
+    .btn-custom:hover,
+    .btn-custom:active,
+    .btn-custom:active:focus {
+        background: #00b8e6;
+        border-color: #00b8e6;
+        color: #fff;
+    }
+
+    .btn-custom:focus {
+        box-shadow: 0 0 0 0.2rem rgba(114,61,190,.25);
+    }
 </style>
 
 @section Scripts {
