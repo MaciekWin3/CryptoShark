@@ -41,6 +41,12 @@ Menadżer zarządzania portelem kryptowalutowym.
 | NF12| Niefunkcjonalne | Bezpieczeństwo  | Testowanie aplikacji  |Kod aplikacji powinien być pokryty testami w jak największym procencie. | P1
 | NF13| Niefunkcjonalne | UI | Stworzenie logo  |Stworzenie unikalnego logo dla aplikacji. | P3
 
+## Screenshots
+### Register Page
+![register](CryptoShark.BlazorServer/wwwroot/images/register.png)
+### Login Page
+![login](CryptoShark.BlazorServer/wwwroot/images/login.png)
+
 
 ## Autorzy
 

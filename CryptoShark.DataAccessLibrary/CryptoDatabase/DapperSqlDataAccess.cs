@@ -44,13 +44,11 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
             return db.Query<UserDataModel>(sql).ToList();
         }
 
-        public UserDataModel UpdateCurrencyFromLastUserDataModel(string Email, string currency, double amount, string operation)
+        public UserDataModel UpdateCurrencyFromLastUserDataModel(string Email, string currency, double amount, string operation) //do zrobienia
         {
-            if(currency == "RVN")
-            {
-                currency = "ravencoin";
-            }
+
             var sql = "";
+            currency = currency.Replace(" ", String.Empty);
             if (operation == "Add")
             {
                 sql = "Update UserData set " + currency + " = " + currency + " + " + amount + " select top 1 * FROM UserData where Email = @Email ORDER BY id";
@@ -75,9 +73,21 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
 
         public List<CryptocurrencySqlModel> GetLastCryptoRecords()
         {
-            var sql = "select * from Cryptocurrencies where id IN (SELECT MAX(id) FROM Cryptocurrencies GROUP BY base)";
+            var sql = "select * from CryptocurrenciesCoinLore where id IN (SELECT MAX(id) FROM CryptocurrenciesCoinLore GROUP BY [name]) order by [name] ";
             return db.Query<CryptocurrencySqlModel>(sql).ToList();
         }
+
+        public List<PortfolioData> GetPortfolioData(string Email)
+        {
+            var sql = @"select avg(bitcoin) as 'bitcoin',avg(ethereum) as 'ethereum',avg(binancecoin) as 'binancecoin',
+                avg(polkadot) as 'polkadot',avg(chainlink) as 'chainlink', avg(monero) as 'monero',
+                avg(dash) as 'dash', avg(zilliqa) as 'zilliqa',avg(ravencoin) as 'ravencoin',avg(uniswap) as 'uniswap', LEFT([save],11) as 'date'
+                from UserData
+                WHERE Email = @Email
+                group by LEFT([save],11)";
+            return db.Query<PortfolioData>(sql, new { @Email = Email }).ToList();
+        }
+
 
     }
 }

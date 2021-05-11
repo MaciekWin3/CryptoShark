@@ -5,7 +5,6 @@
 @using System.Dynamic
 
 @inject IDapperSqlDataAccess DapperDb
-@inject ICryptocurrenciesData _db
 @inject IHangfireJobs HangfireDb
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -34,6 +33,7 @@
                 <AccumulationChartTooltipSettings Enable="true" Header="Amount ($)"></AccumulationChartTooltipSettings>
                 <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
             </SfAccumulationChart>
+            <p>@totalValue</p>
         </div>
     </div>
 </div>
@@ -52,32 +52,30 @@
                         <th scope="col">Price</th>
                         <th scope="col">Change</th>
                         <th scope="col">Volume</th>
-                        <th scope="col">Add</th>
-                        <th scope="col">Subtract</th>
+                        <th scope="col">Edit</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var Crypto in cryptocurrencies)
                     {
                         <tr>
-                            <td><a>@Crypto.Base</a></td>
-                            <td>@Crypto.Price</td>
-                            @if (@Crypto.Change > 0)
+                            <td><a>@Crypto.Name</a></td>
+                            <td>@Crypto.Price_usd</td>
+                            @if (@Crypto.Percent_change_24h > 0)
                             {
-                                <td><p style="color:#18b53c;">@Crypto.Change</p></td>
+                                <td><p style="color:#18b53c;">@Crypto.Percent_change_24h %</p></td>
                             }
-                            else if (@Crypto.Change == 0)
+                            else if (@Crypto.Percent_change_24h == 0)
                             {
-                                <td><p>@Crypto.Change</p></td>
+                                <td><p>@Crypto.Percent_change_24h %</p></td>
                             }
-                            else if (@Crypto.Change < 0)
+                            else if (@Crypto.Percent_change_24h < 0)
                             {
-                                <td><p style="color:red;">@Crypto.Change</p></td>
+                                <td><p style="color:red;">@Crypto.Percent_change_24h %</p></td>
                             }
 
-                            <td>@Crypto.Volume</td>
-                            <td><button type="button" @onclick="@(() => ShowEditUserData(username, Crypto.Base))" class="btn btn-success">   +   </button></td>
-                            <td><button type="button" @onclick="@(() => ShowEditUserData(username, Crypto.Base))" class="btn btn-danger">   -   </button></td>
+                            <td>@Crypto.Volume24</td>
+                            <td><button type="button" @onclick="@(() => ShowEditUserData(username, Crypto.Name))" class="btn btn-outline-info">Edit</button></td>
                         </tr>
                     }
                 </tbody>
@@ -86,35 +84,27 @@
 
     </div>
 </div>
-<p>@id</p>
-<p>@bitcoin</p>
 
 
 
 @code{
 
-
+    string[] CryptoList = new string[10]
+   { "BTC", "ETH", "BNB", "DOT", "LINK", "XMR", "DASH", "ZIL", "RVN", "UNI"}; // kolejnosc?
 
     [CascadingParameter] public IModalService Modal { get; set; }
 
     //public List<ExpandoObject> MedalDetails { get; set; } = new List<ExpandoObject>();
 
-    void ShowEditUserData(string username, string Base)
+    void ShowEditUserData(string username, string Name)
     {
         var parameters = new ModalParameters();
         parameters.Add(nameof(EditUserData.Username), username);
-        parameters.Add(nameof(EditUserData.Base), Base);
+        parameters.Add(nameof(EditUserData.Name), Name);
 
-        Modal.Show<EditUserData>("Crypto Manager", parameters);
+        Modal.Show<EditUserData>($"{Name} Manager", parameters);
     }
-
-
-    string[] CryptoList = new string[10]
-    { "btc-usd", "eth-usd", "bnb-usd", "etc-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd"}; // kolejnosc?
-
-    //public static Dictionary<string, double> PricesAndAmount = new Dictionary<string, double>();
-
-    //public static List<double> PricesAndAmount = new List<double>();
+    double totalValue = 0;
 
     public static double[] PricesAndAmount = new double[10];
 
@@ -122,8 +112,7 @@
     double[] Amount = new double[10];
 
     private List<CryptocurrencySqlModel> cryptocurrencies;
-    private List<UserDataModel> LineChartData;
-
+    private List<PortfolioData> LineChartData;
 
 
     public string username;
@@ -139,21 +128,10 @@
     public double dash = 0;
     public double zillqa = 0;
     public double ravencoin = 0;
-    public double etherumclassic = 0;
+    public double uniswap = 0;
 
     string errorString;
     CryptocurrencyModel crypto;
-
-    public static double bitcoinAmonutWithActualPrice = 0;
-    public static double ethereumAmonutWithActualPrice = 0;
-    public static double binancecoinAmonutWithActualPrice = 0;
-    public static double polkadotAmonutWithActualPrice = 0;
-    public static double chainlinkAmonutWithActualPrice = 0;
-    public static double moneroAmonutWithActualPrice = 0;
-    public static double dashAmonutWithActualPrice = 0;
-    public static double zillqaAmonutWithActualPrice = 0;
-    public static double ravencoinAmonutWithActualPrice = 0;
-    public static double etherumclassicAmonutWithActualPrice = 0;
 
 
     protected override async Task OnInitializedAsync()
@@ -173,70 +151,53 @@
         if (username != null)
         {
 
-            LineChartData = DapperDb.GetAllUserDataForUser(username);
+            LineChartData = DapperDb.GetPortfolioData(username);
             var userdata = DapperDb.GetLastUserDataModel(username); //email
             id = userdata.Id;
 
-            bitcoin = userdata.Bitcoin;
-            Amount[0] = bitcoin;
-
-            ethereum = userdata.Ethereum;
-            Amount[1] = ethereum;
-
             binancecoin = userdata.BinanceCoin;
-            Amount[2] = binancecoin;
+            Amount[0] = binancecoin;
 
-            etherumclassic = userdata.EtherumClassic;
-            Amount[3] = etherumclassic;
-
-            polkadot = userdata.Polkadot;
-            Amount[4] = polkadot;
+            bitcoin = userdata.Bitcoin;
+            Amount[1] = bitcoin;
 
             chainlink = userdata.Chainlink;
-            Amount[5] = chainlink;
-
-            monero = userdata.Monero;
-            Amount[6] = monero;
+            Amount[2] = chainlink;
 
             dash = userdata.Dash;
-            Amount[7] = dash;
+            Amount[3] = dash;
 
-            zillqa = userdata.Zilliqa;
-            Amount[8] = zillqa;
+            ethereum = userdata.Ethereum;
+            Amount[4] = ethereum;
+
+            monero = userdata.Monero;
+            Amount[5] = monero;
+
+            polkadot = userdata.Polkadot;
+            Amount[6] = polkadot;
 
             ravencoin = userdata.RavenCoin;
-            Amount[9] = ravencoin;
+            Amount[7] = ravencoin;
 
+            uniswap = userdata.Uniswap;
+            Amount[8] = uniswap;
+
+            zillqa = userdata.Zilliqa;
+            Amount[9] = zillqa;
 
         }
 
+        cryptocurrencies.OrderBy(x => x.Name);
 
         for (int i = 0; i < CryptoList.Length; i++)
         {
-            //Api call
-            var request = new HttpRequestMessage(HttpMethod.Get,
-                CryptoList[i]);
-
-            var client = _clientFactory.CreateClient("cryptonator");
-
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                crypto = await response.Content.ReadFromJsonAsync<CryptocurrencyModel>();
-                //date = DateTimeOffset.FromUnixTimeSeconds(crypto.Timestamp + 3600);
-                errorString = null;
-            }
-            else
-            {
-                errorString = $"There was an error : { response.ReasonPhrase }";
-            }
-
-
-            PricesAndAmount[i] = Double.Parse(crypto.Ticker.Price, CultureInfo.InvariantCulture) * Amount[i];
-
+            Console.WriteLine(Amount[i]);
+            Console.WriteLine(cryptocurrencies[i].Name + " = " + cryptocurrencies[i].Price_usd);
+            Console.WriteLine(cryptocurrencies[i].Price_usd * Amount[i]);
+            PricesAndAmount[i] = cryptocurrencies[i].Price_usd * Amount[i];
         }
-
+        cryptocurrencies.OrderBy(x => x.Rank);
+        totalValue = Math.Round(PricesAndAmount.Sum(), 2);
 
     }
 
@@ -247,7 +208,7 @@
     }
 
     public List<ChartData> MedalDetails = new List<ChartData>
-    {
+{
         new ChartData { X= "South Korea", Y= 39.4 },
         new ChartData { X= "India", Y= 61.3 },
         new ChartData { X= "Pakistan", Y= 20.4 },
@@ -272,17 +233,17 @@
 
     //if w przypadku braków środków
     public List<Statistics> StatisticsDetails = new List<Statistics>
-    {
-        new Statistics { Cryptocurrency = "Bitcoin", Amount = Math.Round(PricesAndAmount[0],2) },
-        new Statistics { Cryptocurrency = "Ethereum", Amount = Math.Round(PricesAndAmount[1],2) },
-        new Statistics { Cryptocurrency = "BinanceCoin", Amount = Math.Round(PricesAndAmount[2],2) },
-        new Statistics { Cryptocurrency = "Polkadot", Amount = Math.Round(PricesAndAmount[3],2)  },
-        new Statistics { Cryptocurrency = "Chainlink", Amount = Math.Round(PricesAndAmount[4],2) },
+{
+        new Statistics { Cryptocurrency = "BinanceCoin", Amount = Math.Round(PricesAndAmount[0],2) },
+        new Statistics { Cryptocurrency = "Bitcoin", Amount = Math.Round(PricesAndAmount[1],2) },
+        new Statistics { Cryptocurrency = "Chainlink", Amount = Math.Round(PricesAndAmount[2],2) },
+        new Statistics { Cryptocurrency = "Dash", Amount = Math.Round(PricesAndAmount[3],2)  },
+        new Statistics { Cryptocurrency = "Ethereum", Amount = Math.Round(PricesAndAmount[4],2) },
         new Statistics { Cryptocurrency = "Monero", Amount = Math.Round(PricesAndAmount[5],2) },
-        new Statistics { Cryptocurrency = "Dash", Amount = Math.Round(PricesAndAmount[6],2) },
-        new Statistics { Cryptocurrency = "Zilliqa", Amount = Math.Round(PricesAndAmount[7],2) },
-        new Statistics { Cryptocurrency = "RavenCoin", Amount = Math.Round(PricesAndAmount[8],2) },
-        new Statistics { Cryptocurrency = "EtherumClassic", Amount = Math.Round(PricesAndAmount[9],2) }
+        new Statistics { Cryptocurrency = "Polkadot", Amount = Math.Round(PricesAndAmount[6],2) },
+        new Statistics { Cryptocurrency = "RavenCoin", Amount = Math.Round(PricesAndAmount[7],2) },
+        new Statistics { Cryptocurrency = "Uniswap", Amount = Math.Round(PricesAndAmount[8],2) },
+        new Statistics { Cryptocurrency = "Zilliqa", Amount = Math.Round(PricesAndAmount[9],2) }
     };
 
 

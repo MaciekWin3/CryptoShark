@@ -11,6 +11,7 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
         List<UserDataModel> GetAllUserDataForUser(string Email);
         List<CryptocurrencySqlModel> GetLastCryptoRecords();
         UserDataModel GetLastUserDataModel(string Email);
+        List<PortfolioData> GetPortfolioData(string Email);
         UserDataModel UpdateCurrencyFromLastUserDataModel(string Email, string currency, double amount, string operation);
     }
 }

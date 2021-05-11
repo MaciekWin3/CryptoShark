@@ -20,7 +20,7 @@ namespace CryptoShark.BlazorServer.Models
         public double Dash { get; set; }
         public double Zilliqa { get; set; }
         public double RavenCoin { get; set; }
-        public double EtherumClassic { get; set; }
+        public double Uniswap { get; set; }
         public DateTime Date { get; set; }
     }
 }

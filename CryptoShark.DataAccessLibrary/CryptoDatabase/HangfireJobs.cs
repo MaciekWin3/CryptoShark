@@ -36,60 +36,95 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
         public static async Task CallApiAndSave(string connectionString)
         {
             //string[] CryptoList = new string[10]
-            //{ "btc-usd", "eth-usd", "bnb-usd", "etc-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd"};           
+            //{ "btc-usd", "eth-usd", "bnb-usd", "etc-usd", "dot-usd", "link-usd", "xmr-usd", "dash-usd", "zil-usd", "rvn-usd", uniswap};   //etc118        
 
-            string[] CryptoList = new string[3] { "btc-usd", "eth-usd", "bnb-usd" };
+            int[] CryptoList = new int[10] { 90, 80, 2710, 45219, 2751, 28, 8, 32334, 32386, 47305 };
+            //int[] CryptoList = new int[1] { 90 };
 
             DateTime myDateTime = DateTime.Now;
-            CryptocurrencyModel CryptoModel;
+            CoinLoreModel CryptoModel;
+            Crypto[] CryptoData = new Crypto[1];
             CryptocurrencySqlModel CryptoSqlModel = new CryptocurrencySqlModel();
 
-            foreach (string element in CryptoList)
+            foreach (int element in CryptoList)
             {
                 await Task.Delay(1000);
                 using (var data = new WebClient())
                 {
-                    string response = data.DownloadString("https://api.cryptonator.com/api/ticker/" + element);
-                    CryptoModel = JsonConvert.DeserializeObject<CryptocurrencyModel>(response);
-
-                    CryptoSqlModel.Base = CryptoModel.Ticker.Base;
-                    CryptoSqlModel.Target = CryptoModel.Ticker.Target;
                     try
                     {
-                        CryptoSqlModel.Price = Double.Parse(CryptoModel.Ticker.Price, CultureInfo.InvariantCulture);
-                        CryptoSqlModel.Volume = Double.Parse(CryptoModel.Ticker.Volume, CultureInfo.InvariantCulture);
-                        CryptoSqlModel.Change = Double.Parse(CryptoModel.Ticker.Change, CultureInfo.InvariantCulture);
+                        string response = data.DownloadString("https://api.coinlore.net/api/ticker/?id=" + element);
+                        CryptoData = JsonConvert.DeserializeObject<Crypto[]>(response);
+                    }
+                    catch (WebException e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+
+                    CryptoSqlModel.Symbol = CryptoData[0].Symbol;
+                    CryptoSqlModel.Name = CryptoData[0].Name;
+                    CryptoSqlModel.Nameid = CryptoData[0].Nameid;
+                    CryptoSqlModel.Rank = CryptoData[0].Rank;
+                    CryptoSqlModel.Market_cap_usd = CryptoData[0].Market_cap_usd;
+                    CryptoSqlModel.Volume24 = CryptoData[0].Volume24;
+                    CryptoSqlModel.Volume24_native = CryptoData[0].Volume24_native;
+                    CryptoSqlModel.Csupply = CryptoData[0].Csupply;
+                    CryptoSqlModel.Price_btc = CryptoData[0].Price_btc;
+                    CryptoSqlModel.Tsupply = CryptoData[0].Tsupply;
+                    CryptoSqlModel.Msupply = CryptoData[0].Msupply;
+
+                    try
+                    {
+                        CryptoSqlModel.Price_usd = Double.Parse(CryptoData[0].Price_usd, CultureInfo.InvariantCulture);
+                        CryptoSqlModel.Percent_change_24h = Double.Parse(CryptoData[0].Percent_change_24h, CultureInfo.InvariantCulture);
+                        CryptoSqlModel.Percent_change_1h = Double.Parse(CryptoData[0].Percent_change_1h, CultureInfo.InvariantCulture);
+                        CryptoSqlModel.Percent_change_7d = Double.Parse(CryptoData[0].Percent_change_7d, CultureInfo.InvariantCulture);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("poza skalą");
+                        Console.WriteLine("Error parsing data to database!");
                     }
-                    CryptoSqlModel.Timestamp = CryptoModel.Timestamp;
+
                     CryptoSqlModel.Date = myDateTime;
+                    Console.WriteLine("skolowano");
 
                     using (IDbConnection db = new SqlConnection(connectionString))
                     {
-                        string sql = @"insert into [dbo].[Cryptocurrencies]
-                                ([base], [currency], [price], [volume], [change], [timestamp], [datetime] )
-                                values (@Base, @Target, @Price, @Volume, @Change, @Timestamp, @Date);";
+                        string sql = @"insert into [dbo].[CryptocurrenciesCoinLore]
+                                ([symbol], [name], [nameid], [rank], [price_usd], [percent_change_24h], [percent_change_1h], [percent_change_7d],
+                                [market_cap_usd], [volume24], [volume24_native], [csupply], [price_btc], [tsupply], [msupply], [datetime])
+                                values (@Symbol, @Name, @Nameid, @Rank, @Price_usd, @Percent_change_24h, @Percent_change_1h,
+                                @Percent_change_7d, @Market_cap_usd, @Volume24, @Volume24_native, @Csupply, @Price_btc, @Tsupply, @Msupply, @Date );";
 
                         try
                         {
                             var result = db.Execute(sql, new
                             {
-                                CryptoSqlModel.Base,
-                                CryptoSqlModel.Target,
-                                CryptoSqlModel.Price,
-                                CryptoSqlModel.Volume,
-                                CryptoSqlModel.Change,
-                                CryptoSqlModel.Timestamp,
+
+                                CryptoSqlModel.Symbol,
+                                CryptoSqlModel.Name,
+                                CryptoSqlModel.Nameid,
+                                CryptoSqlModel.Rank,
+                                CryptoSqlModel.Price_usd,
+                                CryptoSqlModel.Percent_change_24h,
+                                CryptoSqlModel.Percent_change_1h,
+                                CryptoSqlModel.Percent_change_7d,
+                                CryptoSqlModel.Market_cap_usd,
+                                CryptoSqlModel.Volume24,
+                                CryptoSqlModel.Volume24_native,
+                                CryptoSqlModel.Csupply,
+                                CryptoSqlModel.Price_btc,
+                                CryptoSqlModel.Tsupply,
+                                CryptoSqlModel.Msupply,
                                 CryptoSqlModel.Date
+                                
                             });
+                            Console.WriteLine("Robie cos");
                         }
                         catch (Exception ex)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("Error with {0}", CryptoSqlModel.Base);
+                            Console.WriteLine("Error with {0}", CryptoSqlModel.Name);
                             Console.WriteLine(ex.Message);
                         }
 
@@ -105,9 +140,9 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
             {
                 string sql = @"insert into [dbo].[UserData]
                                 ([userId], [email], [bitcoin], [ethereum], [binancecoin], [polkadot], [chainlink],[monero],
-                                [dash], [zilliqa], [ravencoin], [etherumclassic], [save])
+                                [dash], [zilliqa], [ravencoin], [uniswap], [save])
                                 select distinct [userId], [email], [bitcoin], [ethereum], [binancecoin], [polkadot], [chainlink],[monero],
-                                [dash], [zilliqa], [ravencoin], [etherumclassic], getdate() from UserData;";
+                                [dash], [zilliqa], [ravencoin], [uniswap], getdate() from UserData;";
 
                 db.Execute(sql);
                 
@@ -136,16 +171,16 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
             newUser.Dash = 0;
             newUser.Zilliqa = 0;
             newUser.RavenCoin = 0;
-            newUser.EtherumClassic = 0;
+            newUser.Uniswap = 0;
             newUser.Date = myDateTime;
 
             using (IDbConnection db = new SqlConnection("Data Source=.\\sqlexpress;Initial Catalog=CryptoSharkAuth;Integrated Security=True;Trusted_Connection=True;MultipleActiveResultSets=true"))
             {
                 string sql = @"insert into [dbo].[UserData]
                                 ([userId], [email], [bitcoin], [ethereum], [binancecoin], [polkadot], [chainlink],[monero],
-                                [dash], [zilliqa], [ravencoin], [etherumclassic], [save])
+                                [dash], [zilliqa], [ravencoin], [uniswap], [save])
                                 values (@UserId, @Email, @Bitcoin, @Ethereum, @BinanceCoin, @Polkadot, @Chainlink, @Monero,
-                                @Dash, @Zilliqa, @RavenCoin, @EtherumClassic, @Date);";
+                                @Dash, @Zilliqa, @RavenCoin, @Uniswap, @Date);";
 
                 try
                 {
@@ -162,7 +197,7 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
                         newUser.Dash,
                         newUser.Zilliqa,
                         newUser.RavenCoin,
-                        newUser.EtherumClassic,
+                        newUser.Uniswap,
                         newUser.Date
                     });
                 }

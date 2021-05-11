@@ -1,24 +1,38 @@
 ﻿@inject IDapperSqlDataAccess DapperDb
+@inject NavigationManager NavigationManager; 
 @using CryptoShark.BlazorServer.Models
 
-<EditForm Model="@Amount" OnValidSubmit="@UpdateValue">
-    <p>
-        <label>Amount</label>
-        <InputNumber @bind-Value="Amount.Amount"></InputNumber>
-       
-    </p>
-    <button type="submit"></button>
-</EditForm>
+<div class="container">
+    <EditForm Model="@Amount" Context="formContext">
+        <p>
+            <label for="amount">Amount:</label>
+            <InputNumber @bind-Value="Amount.Amount" id="amount" placeholder="Enter value..." class="form-control"></InputNumber>
 
-<p>@Username</p>
-<p>@Base</p>
+        </p>
+        <div class="row align-items-end" id="container">
+            <button type="submit" class="btn btn-success" @onclick="@(() => UpdateValueAdd(formContext))">Add</button>
+            <button type="submit" class="btn btn-danger" @onclick="@(() => UpdateValueSubtract(formContext))">Delete</button>
+        </div>
+       
+    </EditForm>
+</div>
+
+<style>
+    #container{
+        flex: 1;
+        justify-content: space-around
+    }
+
+</style>
+
+
 
 @code {
 
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
     [Parameter] public string Username { get; set; }
-    [Parameter] public string Base { get; set; }
+    [Parameter] public string Name { get; set; }
 
     UserDataModel UserData { get; set; }
 
@@ -30,11 +44,19 @@
         UserData = DapperDb.FindUserDataModelByEmail(Username);
     }
 
-    void UpdateValue()
+    void UpdateValueAdd(EditContext formContext)
     {
         //MovieService.Save(Movie);
-        DapperDb.UpdateCurrencyFromLastUserDataModel(Username, Base, Amount.Amount, "Add" );
-        ModalInstance.CloseAsync(ModalResult.Ok<UserDataModel>(UserData));
+        DapperDb.UpdateCurrencyFromLastUserDataModel(Username, Name, Amount.Amount, "Add" );
+        NavigationManager.NavigateTo("/", true);
+        //ModalInstance.CloseAsync(ModalResult.Ok<UserDataModel>(UserData));
+    }
+    void UpdateValueSubtract(EditContext formContext)
+    {
+        //MovieService.Save(Movie);
+        DapperDb.UpdateCurrencyFromLastUserDataModel(Username, Name, Amount.Amount, "Subtract");
+        NavigationManager.NavigateTo("/", true);
+        //ModalInstance.CloseAsync(ModalResult.Ok<UserDataModel>(UserData));
     }
 
 }

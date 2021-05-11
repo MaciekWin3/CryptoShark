@@ -17,7 +17,6 @@ using Microsoft.Extensions.Hosting;
 using System;
 using Syncfusion.Blazor;
 using Hangfire.SqlServer;
-using CryptoShark.DataAccessLibrary.CryptoDatabase.DataAccessLibrary;
 using Blazored.Modal;
 
 
@@ -61,8 +60,6 @@ namespace CryptoShark.BlazorServer
 
 
             //Data Access
-            services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-            services.AddTransient<ICryptocurrenciesData, CryptocurrenciesData>();
             services.AddTransient<IHangfireJobs, HangfireJobs>();
             services.AddTransient<IDapperSqlDataAccess, DapperSqlDataAccess>();
 
