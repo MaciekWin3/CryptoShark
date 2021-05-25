@@ -18,22 +18,35 @@
             <SfChart Title="Total Balance">
                 <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"></ChartPrimaryXAxis>
                 <ChartSeriesCollection>
-                    <ChartSeries DataSource="@MedalDetails" XName="X" YName="Y" Type="ChartSeriesType.Line">
+                    <ChartSeries DataSource="@ChartLine" XName="X" YName="Y" Type="ChartSeriesType.Line">
                     </ChartSeries>
                 </ChartSeriesCollection>
             </SfChart>
         </div>
         <div class="col-4">
-            <SfAccumulationChart Title="Your portfolio">
-                <AccumulationChartSeriesCollection>
-                    <AccumulationChartSeries DataSource="@StatisticsDetails" XName="Cryptocurrency" YName="Amount"
-                                             Name="Amount" InnerRadius="40%">
-                    </AccumulationChartSeries>
-                </AccumulationChartSeriesCollection>
-                <AccumulationChartTooltipSettings Enable="true" Header="Amount ($)"></AccumulationChartTooltipSettings>
-                <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
-            </SfAccumulationChart>
-            <p>@totalValue</p>
+            @if (PricesAndAmount.Sum() == 0)
+            {
+                <div class="container h-100">
+                    <div class="h-100 row align-items-center justify-content-center gx-5">
+                        <div class="col text-center m-2 p-2">
+                            <h2>No cryptocurrencies owned</h2>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <SfAccumulationChart Title="Your portfolio">
+                    <AccumulationChartSeriesCollection>
+                        <AccumulationChartSeries DataSource="@StatisticsDetails" XName="Cryptocurrency" YName="Amount"
+                                                 Name="Amount" InnerRadius="50%">
+                        </AccumulationChartSeries>
+                    </AccumulationChartSeriesCollection>
+                    <AccumulationChartTooltipSettings Enable="true" Header="Amount ($)"></AccumulationChartTooltipSettings>
+                    <AccumulationChartLegendSettings Visible="false"></AccumulationChartLegendSettings>
+                </SfAccumulationChart>
+            }
+
         </div>
     </div>
 </div>
@@ -50,7 +63,8 @@
                     <tr>
                         <th scope="col">Name</th>
                         <th scope="col">Price</th>
-                        <th scope="col">Change</th>
+                        <th scope="col">Change 24h</th>
+                        <th scope="col">Change 7d</th>
                         <th scope="col">Volume</th>
                         <th scope="col">Edit</th>
                     </tr>
@@ -58,25 +72,36 @@
                 <tbody>
                     @foreach (var Crypto in cryptocurrencies)
                     {
-                        <tr>
-                            <td><a>@Crypto.Name</a></td>
-                            <td>@Crypto.Price_usd</td>
-                            @if (@Crypto.Percent_change_24h > 0)
-                            {
-                                <td><p style="color:#18b53c;">@Crypto.Percent_change_24h %</p></td>
-                            }
-                            else if (@Crypto.Percent_change_24h == 0)
-                            {
-                                <td><p>@Crypto.Percent_change_24h %</p></td>
-                            }
-                            else if (@Crypto.Percent_change_24h < 0)
-                            {
-                                <td><p style="color:red;">@Crypto.Percent_change_24h %</p></td>
-                            }
-
-                            <td>@Crypto.Volume24</td>
-                            <td><button type="button" @onclick="@(() => ShowEditUserData(username, Crypto.Name))" class="btn btn-outline-info">Edit</button></td>
-                        </tr>
+                    <tr>
+                        <td><a>@Crypto.Name</a></td>
+                        <td>@Crypto.Price_usd</td>
+                        @if (@Crypto.Percent_change_24h > 0)
+                        {
+                            <td><p style="color:#18b53c;">@Crypto.Percent_change_24h %</p></td>
+                        }
+                        else if (@Crypto.Percent_change_24h == 0)
+                        {
+                            <td><p>@Crypto.Percent_change_24h %</p></td>
+                        }
+                        else if (@Crypto.Percent_change_24h < 0)
+                        {
+                            <td><p style="color:red;">@Crypto.Percent_change_24h %</p></td>
+                        }
+                        @if (@Crypto.Percent_change_7d > 0)
+                        {
+                            <td><p style="color:#18b53c;">@Crypto.Percent_change_7d %</p></td>
+                        }
+                        else if (@Crypto.Percent_change_7d == 0)
+                        {
+                            <td><p>@Crypto.Percent_change_7d %</p></td>
+                        }
+                        else if (@Crypto.Percent_change_7d < 0)
+                        {
+                            <td><p style="color:red;">@Crypto.Percent_change_7d %</p></td>
+                        }
+                        <td>@Crypto.Volume24</td>
+                        <td><button type="button" @onclick="@(() => ShowEditUserData(username, Crypto.Name))" class="btn btn-outline-info">Edit</button></td>
+                    </tr>
                     }
                 </tbody>
             </table>
@@ -113,6 +138,8 @@
 
     private List<CryptocurrencySqlModel> cryptocurrencies;
     private List<PortfolioData> LineChartData;
+    public List<LineChartData> HistoricData;
+    public List<ExpandoObject> ChartLine{ get; set; } = new List<ExpandoObject>();
 
 
     public string username;
@@ -131,7 +158,6 @@
     public double uniswap = 0;
 
     string errorString;
-    CryptocurrencyModel crypto;
 
 
     protected override async Task OnInitializedAsync()
@@ -142,7 +168,6 @@
 
         cryptocurrencies = DapperDb.GetLastCryptoRecords();
 
-
         var authstate = await GetAuthenticationStateAsync.GetAuthenticationStateAsync();
         var user = authstate.User;
         username = user.Identity.Name;
@@ -150,7 +175,7 @@
 
         if (username != null)
         {
-
+            HistoricData = DapperDb.GetChartData(username, "bitcoin");
             LineChartData = DapperDb.GetPortfolioData(username);
             var userdata = DapperDb.GetLastUserDataModel(username); //email
             id = userdata.Id;
@@ -187,6 +212,7 @@
 
         }
 
+
         cryptocurrencies.OrderBy(x => x.Name);
 
         for (int i = 0; i < CryptoList.Length; i++)
@@ -199,29 +225,23 @@
         cryptocurrencies.OrderBy(x => x.Rank);
         totalValue = Math.Round(PricesAndAmount.Sum(), 2);
 
+        ChartLine = Enumerable.Range(0, HistoricData.Count).Select((x) =>
+        {
+            dynamic d = new ExpandoObject();
+            if(x == 0)
+            {
+                d.X = HistoricData[x].Date;
+                d.Y = 0;
+            }
+            d.X = HistoricData[x].Date;
+            d.Y = HistoricData[x].Value;
+            return d;
+        }).Cast<ExpandoObject>().ToList<ExpandoObject>();
+
+
     }
 
-    public class ChartData
-    {
-        public string X { get; set; }
-        public double Y { get; set; }
-    }
 
-    public List<ChartData> MedalDetails = new List<ChartData>
-{
-        new ChartData { X= "South Korea", Y= 39.4 },
-        new ChartData { X= "India", Y= 61.3 },
-        new ChartData { X= "Pakistan", Y= 20.4 },
-        new ChartData { X= "Germany", Y= 65.1 },
-        new ChartData { X= "Australia", Y= 15.8 },
-        new ChartData { X= "Italy", Y= 29.2 },
-        new ChartData { X= "United Kingdom", Y= 44.6 },
-        new ChartData { X= "Saudi Arabia", Y= 9.7 },
-        new ChartData { X= "Russia", Y= 40.8 },
-        new ChartData { X= "Mexico", Y= 31 },
-        new ChartData { X= "Brazil", Y= 75.9 },
-        new ChartData { X= "China", Y= 51.4 }
-    };
 
 
 

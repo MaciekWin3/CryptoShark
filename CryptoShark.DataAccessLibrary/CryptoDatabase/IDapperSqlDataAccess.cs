@@ -9,6 +9,7 @@ namespace CryptoShark.DataAccessLibrary.CryptoDatabase
         UserDataModel FindUserDataModelByEmail(string Email);
         List<UserDataModel> GetAllLastUserDataModel();
         List<UserDataModel> GetAllUserDataForUser(string Email);
+        List<LineChartData> GetChartData(string Email, string currnecy);
         List<CryptocurrencySqlModel> GetLastCryptoRecords();
         UserDataModel GetLastUserDataModel(string Email);
         List<PortfolioData> GetPortfolioData(string Email);
