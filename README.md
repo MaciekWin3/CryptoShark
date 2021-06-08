@@ -65,6 +65,16 @@ Menadżer zarządzania portelem kryptowalutowym.
 
 ![uml](CryptoShark.BlazorServer/wwwroot/images/komponenty.png)
 
+### Scenariusze testów
+| Id | Nazwa | Opis | Typ | Czynności przygotowawcze | Przebieg testu |
+| --- | --- | --- | --- | --- | --- |
+| 1 |Współpraca z API kryptowalutowym|Przetestowanie działania zewnętrznego API, jego stabilności oraz współpracy z naszą aplikacją. |Testy funkcjonalne| Uruchomienie projektu|Monitorowanie działania biblioteki Hangfire oraz sprawdzanie czy API jest cały czas stabilne.| 
+| 2 |Wizualizacja danych | Sprawdzenie działania wykresów|Testy funkcjonalne| Uruchomienie aplikacji oraz zalogowanie się do niej|Sprawdzenie czy dane przedstawione na wykresie pokrywają się z danymi w bazie danych.| 
+| 3 |CRUD dla danych użytkownika|Sprawdzanie poprawności pobierania, edycji, usuwania i wyświetlania danych z kontrolera użytkownika|Testy funkcjonalne|Uruchomienie aplikacji, zalogowanie się do niej oraz przeprowadzenie wszystkich czynności CRUD |Sprawdzenie czy wszytkie funkcjonalności działają oraz czy nie mają żadnych błędów.| 
+| 4 | Autoryzacja|Sprawdzenie działania autoryzacji w aplikacji|Testy funkcjonalne |Uruchomienie aplikacji| Przetestowanie dostępu do poszczególnych stron przez użytkownika zalogowanego oraz niezalogowanego.|
+| 5 | Szata graficzna |Sprawdzenie przejrzystości interfejsu oraz praca nad animacjami|-|Uruchomienie aplikacji|Weryfikacja interfejsu graficznego.|
+| 6 | Testy bezpieczeństwa |Sprawdzenie czy aplikacja jest bezpieczna|Testy funkcjonalne|Próba złamania zabezpieczeń aplikacji|-|
+
 
 ## Autorzy
 
