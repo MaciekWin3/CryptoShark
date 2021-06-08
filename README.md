@@ -31,7 +31,8 @@ Menadżer zarządzania portelem kryptowalutowym.
 | F7 | Funkcjonalne | Statystyki | Lista z wybranymi aktywami  |Użytkownik może śledzić interesujące go aktywa | P1
 
 ### Wymagania niefunkcjonalne
-
+| ID | Kategoria | Podkategoria | Nazwa krótka | Opis | Priorytet
+| ------------- | ------------- |------|------|---------|--------|
 | NF1 | Niefunkcjonalne | Autoryzacja | Wdrożenie  Autoryzacji zewnętrzenej  |Użytkownik może zalogować się używając zewnętrznej autoryzacji | P1
 | NF2 | Niefunkcjonalne | Dane| Api |Aplikacja komunikuje się z api | P1
 | NF3 | Niefunkcjonalne |Dane| Autozapisy  |Aplikacja automatycznie zapisuje dane z api oraz dane użytkownika (co godzinę) | P1
