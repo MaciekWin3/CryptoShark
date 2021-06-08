@@ -47,6 +47,16 @@ Menadżer zarządzania portelem kryptowalutowym.
 ### Login Page
 ![login](CryptoShark.BlazorServer/wwwroot/images/login.png)
 
+## Diagramy
+
+### UML
+
+![uml](CryptoShark.BlazorServer/wwwroot/images/diagram.png)
+
+### Komponenty
+
+![uml](CryptoShark.BlazorServer/wwwroot/images/komponenty.png)
+
 
 ## Autorzy
 
