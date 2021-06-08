@@ -18,6 +18,8 @@ Menadżer zarządzania portelem kryptowalutowym.
 
 ## Specyfikacja wymagań
 
+### Wymagania funkcjonalne
+
 | ID | Kategoria | Podkategoria | Nazwa krótka | Opis | Priorytet
 | ------------- | ------------- |------|------|---------|--------|
 | F1  | Funkcjonalne  | Autoryzacja  | Autoryzacja | Możliwość rejestracji oraz zalogowania się do aplikacji. | P1
@@ -27,7 +29,10 @@ Menadżer zarządzania portelem kryptowalutowym.
 | F5  | Funkcjonalne  |Bazy danych | Historyczne wyceny  |Ceny aktywów powinny być zapisywane w bazie danych tak aby lepiej śledzić wartość portfela krypowalutowego użytkownika. | P1
 | F6 | Funkcjonalne | UI | Szata graficzna  | Prosty, interaktywny oraz przejrzysty interfejs  | P1
 | F7 | Funkcjonalne | Statystyki | Lista z wybranymi aktywami  |Użytkownik może śledzić interesujące go aktywa | P1
-| N1 | Niefunkcjonalne | Autoryzacja | Wdrożenie  Autoryzacji zewnętrzenej  |Użytkownik może zalogować się używając zewnętrznej autoryzacji | P1
+
+### Wymagania niefunkcjonalne
+
+| NF1 | Niefunkcjonalne | Autoryzacja | Wdrożenie  Autoryzacji zewnętrzenej  |Użytkownik może zalogować się używając zewnętrznej autoryzacji | P1
 | NF2 | Niefunkcjonalne | Dane| Api |Aplikacja komunikuje się z api | P1
 | NF3 | Niefunkcjonalne |Dane| Autozapisy  |Aplikacja automatycznie zapisuje dane z api oraz dane użytkownika (co godzinę) | P1
 | NF4 | Niefunkcjonalne | Dane| Komunikacja z bazą danych  |Aplikacja powinna komunikować się z bazą przez utworzone wcześniej funkcje | P1
@@ -47,6 +52,8 @@ Menadżer zarządzania portelem kryptowalutowym.
 ### Login Page
 ![login](CryptoShark.BlazorServer/wwwroot/images/login.png)
 
+### Main Page
+![main](CryptoShark.BlazorServer/wwwroot/images/main.png)
 ## Diagramy
 
 ### UML
